@@ -1,0 +1,4 @@
+Welcome to the IBM Quantum Computing Certification Prep area - this space is yours to deposit your JNB's here.
+Please include a robust README to assist the user in understanding your contribution.
+Thank you for your time - lets all pass the exam !
+
