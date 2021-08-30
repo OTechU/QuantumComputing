@@ -1,0 +1,3 @@
+[submodule "QDocker/oqs-demos"]
+	path = QDocker/oqs-demos
+	url = https://github.com/andrew-nash/oqs-demos
