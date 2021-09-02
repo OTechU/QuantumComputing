@@ -1,0 +1,13 @@
+version: "3.0"
+services:
+  client:
+    container_name: FileClient
+    build: ./client
+    tty: true
+    cap_add:
+    - NET_ADMIN
+  server:
+    container_name: FileServer
+    build: ./server
+    cap_add:
+    - ALL

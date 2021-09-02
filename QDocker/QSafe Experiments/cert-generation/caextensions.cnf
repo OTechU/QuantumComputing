@@ -1,0 +1,16 @@
+basicConstraints=CA:FALSE
+extendedKeyUsage=serverAuth,clientAuth
+subjectAltName=@my_subject_alt_names
+subjectKeyIdentifier = hash
+
+[ my_subject_alt_names ]
+DNS.1 = localhost
+DNS.2 = oqs-httpd
+DNS.3 = FileServer
+DNS.4 = VideoServer
+DNS.5 = ApiServer
+DNS.6 = oqs-httpd:4433
+DNS.7 = oqs-httpd:4433:0
+IP.1 = 192.168.173.193
+IP.2 = 172.18.26.49
+IP.3 = 192.168.56.1
