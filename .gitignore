@@ -21,6 +21,9 @@ $RECYCLE.BIN/
 # Mac Storage Files
 .DS_Store
 
+# large video files
+*.webm
+
 # =========================
 # Operating System Files
 # =========================
