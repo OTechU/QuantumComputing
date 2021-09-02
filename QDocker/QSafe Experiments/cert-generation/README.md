@@ -1,5 +1,8 @@
 # Generating Trusted Certs to Run Experiments
 
+# Warning
+Do not use the certs and keys provided in this repo. They exposed on the internet, and are examples for debugging purposes only.
+
 ## Certificate Authority
 
 1. Navigate to `.\CA` in cmd, and simply run ca0generation.bat to generate a sample CA certificate that can be used to sign SSL certs.
