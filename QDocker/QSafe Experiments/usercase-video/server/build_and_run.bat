@@ -1,3 +1,6 @@
+docker kill VideoServer
+docker rm VideoServer
+
 docker build . -t videousercaseserver/quantum:v0.1
 
 
