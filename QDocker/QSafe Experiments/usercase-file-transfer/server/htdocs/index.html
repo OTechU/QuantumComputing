@@ -1,10 +1,303 @@
-  <!DOCTYPE html>
-  <html lang="en" dir="ltr">
-    <head>
-      <meta charset="utf-8">
-      <title></title>
-    </head>
-    <body>
-      Hello.
-    </body>
-  </html>
+<!DOCTYPE html>
+<html>
+  <head>
+    <!--
+      Author:  Franklin (https://fvdm.com)
+      Source:  https://github.com/fvdm/speedtest
+    -->
+    <meta charset="UTF-8">
+    <title>Speedtest</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  </head>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+    <div id="wrap">
+      <p>
+        <button data-file="5mb.bin">5 M</button>
+        <button data-file="10mb.bin">10 M</button>
+        <button data-file="100mb.bin">100 M</button>
+        <button data-file="200mb.bin">200 M</button>
+        <button data-file="500mb.bin">500 M</button>
+        <button data-file="1000mb.bin">1 G</button>
+      </p>
+      <p>
+        <progress value="0" max="100"></progress>
+      </p>
+      <p>
+        <span id="result">speedtest</span><br>
+        <span id="eta">choose a size</span>
+      </p>
+    </div>
+    <hr>
+    <canvas id="downloadChart"></canvas>
+    <canvas id="uploadChart"></canvas>
+
+    <script>
+    	var ctx = document.getElementById("downloadChart").getContext('2d');
+
+
+      var downloadChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: [],
+              datasets: [{
+                  label: 'Download Speed (MBits/s)', // Name the series
+                  data: [], // Specify the data values array
+                  fill: false,
+                  borderColor: '#2196f3', // Add custom color border (Line)
+                  backgroundColor: '#2196f3', // Add custom color background (Points and Fill)
+                  borderWidth: 1 // Specify bar border width
+              }]},
+          options: {
+          }
+      });
+
+      var uctx = document.getElementById("uploadChart").getContext('2d');
+      var uploadChart = new Chart(uctx, {
+          type: 'line',
+          data: {
+              labels: [],
+              datasets: [{
+                  label: 'Upload Speed (MBits/s)', // Name the series
+                  data: [], // Specify the data values array
+                  fill: false,
+                  borderColor: '#2196f3', // Add custom color border (Line)
+                  backgroundColor: '#2196f3', // Add custom color background (Points and Fill)
+                  borderWidth: 1 // Specify bar border width
+              }]},
+          options: {
+          }
+      });
+
+    	addPoint = function (value,percent,updown) {
+
+        if (updown=="download"){
+          downloadChart.data.labels.push(percent);
+          downloadChart.data.datasets[0].data.push(value);
+         downloadChart.update();
+        }
+        else if (updown=="upload") {
+          uploadChart.data.labels.push(percent);
+          uploadChart.data.datasets[0].data.push(value);
+         uploadChart.update();
+        }
+
+    	}
+
+
+      // global vars
+      let req;
+      let avg = {};
+      let progress = {}
+      let start = 0;
+      let decimals = 0;
+      let binaryData;
+      let downloadTime = 0;
+
+
+      // store <button> tags in array
+      const btns = Array.from (document.querySelectorAll ('button'));
+
+      // add click handler to buttons
+      btns.forEach (btn => {
+        btn.addEventListener ('click', testDownload);
+      });
+
+
+
+      /**
+       * Test completed
+       *
+       * @return  {void}
+       */
+
+      function testDone (updown, evBtn, evReq) {
+        const diff = (Date.now() - start) / 1000;
+
+        if (updown === 'download') {
+          binaryData = req.response;
+          document.querySelector ('#eta').innerHTML = diff.toFixed(2) + ' sec';
+          downloadTime = diff.toFixed(2);
+          testUpload (evBtn);
+        }
+        else {
+          binaryData = null;
+          resultString =
+            "Average Download/Upload: "+avg.download.toFixed(1)
+            + ' / ' + avg.upload.toFixed(1)
+            + ' MBits/s'
+          ;
+
+          document.querySelector ('progress').style.visibility = 'hidden';
+          document.querySelector ('#result').className = 'resultDone';
+          document.querySelector ('#result').innerHTML = resultString;
+          if (updown=="upload"){
+            console.log(diff.toFixed(2), downloadTime);
+            document.querySelector ('#eta').innerHTML = downloadTime + "   ( upload "+diff.toFixed(2) + ' sec)';
+          }
+          req = null;
+        }
+      }
+
+
+      /**
+       * Test progress handler
+       *
+       * @param   {Event}  ev  XMLHttpRequest.onprogress event
+       * @return  {void}
+       */
+
+      function testRunning (updown, ev) {
+        const now = Date.now ();
+
+        let percent = 0.0;
+        let Bps = 0;
+        avg[updown] = 0;
+        let eta = 0;
+        let total = ev.total;
+        let diff = 0;
+
+        if (updown === 'upload') {
+          total = binaryData.size;
+        }
+
+        if (ev.lengthComputable && total) {
+          diff = (now - start) / 1000;
+          Bps = ev.loaded / diff;
+          mbit = Bps / 1024 / 1024 * 8;
+          avg[updown] = mbit;
+          percent = ev.loaded / total * 100.0;
+          eta = (total - ev.loaded) / Bps;
+          addPoint(mbit,percent,updown);
+        }
+
+        if (updown === 'upload') {
+          percent = 100 - percent;
+        }
+
+        document.querySelector ('progress').value = percent;
+        document.querySelector ('#result').innerHTML = avg[updown].toFixed(3) + ' Mbit/s';
+        document.querySelector ('#eta').innerHTML = eta.toFixed(1) + ' sec';
+      }
+
+      function createChart(){
+        downloadChart.destroy();
+        uploadChart.destroy();
+        downloadChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Download Speed (MBits/s)', // Name the series
+                    data: [], // Specify the data values array
+                    fill: false,
+                    borderColor: '#2196f3', // Add custom color border (Line)
+                    backgroundColor: '#2196f3', // Add custom color background (Points and Fill)
+                    borderWidth: 1 // Specify bar border width
+                }]},
+            options: {
+            }
+        });
+        uploadChart = new Chart(uctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Upload Speed (MBits/s)', // Name the series
+                    data: [], // Specify the data values array
+                    fill: false,
+                    borderColor: '#2196f3', // Add custom color border (Line)
+                    backgroundColor: '#2196f3', // Add custom color background (Points and Fill)
+                    borderWidth: 1 // Specify bar border width
+                }]},
+            options: {
+            }
+        });
+      }
+
+      /**
+       * Start new test
+       * and abort any running test
+       *
+       * @param   {Event}  ev  Click event
+       * @return  {void}
+       */
+
+      function testDownload (btnEv) {
+        if (req) {
+          req.abort ();
+        }
+        createChart();
+
+        req = new XMLHttpRequest;
+        start = Date.now ();
+
+        btns.forEach (btn => {
+          btn.className = '';
+        });
+
+        btnEv.target.className = 'choice';
+        document.querySelector ('progress').value = 0;
+        document.querySelector ('progress').style.visibility = 'visible';
+
+        req.onprogress = (progEv) => {
+          testRunning ('download', progEv);
+        };
+
+        req.onreadystatechange = (reqEv) => {
+          if (req.readyState === 4) {
+            testDone ('download', btnEv, reqEv);
+          }
+        };
+
+        // load file avoiding the cache
+        req.open ('GET', btnEv.target.dataset.file + '?nocache=' + start, true);
+        req.responseType = 'blob';
+        req.send (null);
+      }
+
+      function testUpload (btnEv) {
+        if (req) {
+          req.abort ();
+        }
+
+        req = new XMLHttpRequest;
+        start = Date.now ();
+
+        if (req.upload) {
+          req.upload.onprogress = (progEv) => {
+            testRunning ('upload', progEv);
+          };
+
+          req.upload.onloadend = (reqEv) => {
+            testDone ('upload', btnEv, reqEv);
+          };
+        }
+        else {
+          req.onprogress = (progEv) => {
+            testRunning ('upload', progEv);
+          };
+
+          req.onreadystatechange = onreadystatechange = (reqEv) => {
+            if (req.readyState === 4) {
+              testDone ('upload', btnEv, reqEv);
+            }
+          };
+        }
+
+        req.open ('POST', '?nocache=' + start, true);
+        req.send (binaryData);
+      }
+    </script>
+
+    	<!-- GRAPH -->
+    <script type="text/javascript">
+
+    </script>
+  </body>
+</html>

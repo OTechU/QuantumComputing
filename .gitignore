@@ -21,13 +21,17 @@ $RECYCLE.BIN/
 # Mac Storage Files
 .DS_Store
 
-# large video files
+# large experiment payload files
 *.webm
+*.bin
+
 
 # generated certs
 *.pem
 index.txt.*
 serial.*
+
+
 
 # =========================
 # Operating System Files
