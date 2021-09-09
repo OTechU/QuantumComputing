@@ -1,3 +1,6 @@
+docker kill FileServer 
+docker rm FileServer 
+
 docker build . -t fileusercaseserver/quantum:v0.1
 
 docker network create httpd-filetest

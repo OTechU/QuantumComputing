@@ -24,6 +24,11 @@ $RECYCLE.BIN/
 # large video files
 *.webm
 
+# generated certs
+*.pem
+index.txt.*
+serial.*
+
 # =========================
 # Operating System Files
 # =========================
