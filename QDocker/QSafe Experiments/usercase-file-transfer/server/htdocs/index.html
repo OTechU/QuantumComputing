@@ -34,9 +34,14 @@
       </p>
     </div>
     <hr>
-    <canvas id="downloadChart"></canvas>
-    <canvas id="uploadChart"></canvas>
+    <div class="chart-div" style="width: 50%;float:left">
+      <canvas id="downloadChart"></canvas>
+      </div>
+    <div class="chart-div" style="width: 50%;float:left">
+      <canvas id="uploadChart"></canvas>
+    </div>
 
+</div>
     <script>
     	var ctx = document.getElementById("downloadChart").getContext('2d');
 
@@ -54,6 +59,15 @@
                   borderWidth: 1 // Specify bar border width
               }]},
           options: {
+            responsive:true,
+            maintainAspectRatio: true,
+            scales: {
+            xAxes: [{
+              ticks: {
+                precision: 1
+              }
+            }]
+          }
           }
       });
 
@@ -70,19 +84,28 @@
                   backgroundColor: '#2196f3', // Add custom color background (Points and Fill)
                   borderWidth: 1 // Specify bar border width
               }]},
-          options: {
-          }
+              options: {
+                responsive:true,
+                maintainAspectRatio: true,
+                scales: {
+                xAxes: [{
+                  ticks: {
+                    precision: 1
+                  }
+                }]
+              }
+              }
       });
 
     	addPoint = function (value,percent,updown) {
 
         if (updown=="download"){
-          downloadChart.data.labels.push(percent);
+          downloadChart.data.labels.push(percent.toFixed(1));
           downloadChart.data.datasets[0].data.push(value);
          downloadChart.update();
         }
         else if (updown=="upload") {
-          uploadChart.data.labels.push(percent);
+          uploadChart.data.labels.push(percent.toFixed(1));
           uploadChart.data.datasets[0].data.push(value);
          uploadChart.update();
         }
@@ -200,8 +223,17 @@
                     backgroundColor: '#2196f3', // Add custom color background (Points and Fill)
                     borderWidth: 1 // Specify bar border width
                 }]},
-            options: {
-            }
+                options: {
+                  responsive:true,
+                  maintainAspectRatio: true,
+                  scales: {
+                  xAxes: [{
+                    ticks: {
+                      precision: 1
+                    }
+                  }]
+                }
+                }
         });
         uploadChart = new Chart(uctx, {
             type: 'line',
@@ -215,8 +247,17 @@
                     backgroundColor: '#2196f3', // Add custom color background (Points and Fill)
                     borderWidth: 1 // Specify bar border width
                 }]},
-            options: {
-            }
+                options: {
+                  responsive:true,
+                  maintainAspectRatio: true,
+                  scales: {
+                  xAxes: [{
+                    ticks: {
+                      precision: 1
+                    }
+                  }]
+                }
+                }
         });
       }
 
