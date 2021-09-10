@@ -1,5 +1,4 @@
 FROM openquantumsafe/httpd
 
 USER root
-
-RUN apk add curl iproute2
+RUN apk add apache2-mod-wsgi
